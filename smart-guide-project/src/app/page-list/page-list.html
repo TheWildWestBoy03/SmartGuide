@@ -1,0 +1,8 @@
+<header id="main-header">
+    <span>SMARTGUIDE</span>
+    <ul class="main-pages-list">
+      <li *ngFor="let page of pages">
+        <a [href]="page.link">{{ page.title }}</a>
+    </li>
+    </ul>
+</header>
