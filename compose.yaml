@@ -1,0 +1,42 @@
+version: '3.9'
+
+services:
+  auth-service:
+    build: ./smart-guide-project/src/app/backend/authentication/
+    ports:
+      - '4000:4000'
+    environment:
+        - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
+  review-service:
+    build: ./smart-guide-project/src/app/backend/reviews/
+    ports:
+      - '4100:4100'
+  routes-service:
+    build: ./smart-guide-project/src/app/backend/routeComputing/
+    ports:
+      - '4300:4300'
+  gateway:
+    build: ./smart-guide-project/src/app/backend/
+    ports:
+      - '3000:3000'
+    depends_on:
+      - routes-service
+      - review-service
+      - auth-service
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: mydatabase
+      MYSQL_USER: myuser
+      MYSQL_PASSWORD: mypassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:

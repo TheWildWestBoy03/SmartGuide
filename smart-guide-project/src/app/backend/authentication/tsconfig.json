@@ -1,0 +1,28 @@
+// tsconfig.json (in your microservice folder)
+{
+  "compilerOptions": {
+    "target": "es2020",
+    "module": "ES2022",
+    "moduleResolution": "node",
+    "outDir": "dist",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+
+    // 👇 ADD THIS LINE to specify the required runtime libraries
+    "lib": [ "es2020", "dom" ],
+
+    // 👇 CORRECT THE 'types' ARRAY
+    // Remove "dom" and remove "jasmine" (if still present from earlier)
+    "types": [
+      "node", // Types for the Node.js environment
+      "jest" // Types for the Jest testing framework
+    ]
+  },
+  "include": [ "./**/*.ts" ],
+  "exclude": [
+    "node_modules/@types/jasmine", // Keep this to prevent Jasmine conflicts
+    "node_modules/vitest",
+    "node_modules/jest-dom"
+  ]
+}
