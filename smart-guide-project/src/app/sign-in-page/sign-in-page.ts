@@ -3,6 +3,8 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormGroup, FormControl } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
+import axios from 'axios';
+// This imports all exports from 'axios' and puts them under the 'axios' namespace object.
 
 @Component({
   selector: 'app-sign-in-page',
@@ -35,7 +37,21 @@ export class SignInPage {
     return this.historicalOptions.filter(opt => this.form.get(opt)?.value === true);
   }
 
-  onSubmit() {
-    console.log(this.selectedValues);
+  async onSubmit() {
+    const authenticationUrl : string = "http://localhost:3000/api/auth/register";
+    const formValues = this.form.value;
+
+    try {
+      const response = await axios.post(authenticationUrl, {
+        firstname: formValues.firstname,
+        lastname: formValues.lastname,
+        email: formValues.email,
+        password: formValues.password,
+        historicalInterests: this.selectedValues
+      });
+
+    } catch (error) {
+      console.error(error);
+    }
   }
 }

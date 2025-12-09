@@ -3,6 +3,7 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
+    "esModuleInterop": true,
     "outDir": "./out-tsc/app",
     "types": [
       "node"
@@ -12,6 +13,9 @@
     "src/**/*.ts"
   ],
   "exclude": [
+    "node_modules/@types/jest",
+    "node_modules/vitest",
+    "node_modules/jest-dom",
     "src/**/*.spec.ts"
   ]
 }
