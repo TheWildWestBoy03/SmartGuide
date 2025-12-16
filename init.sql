@@ -200,3 +200,44 @@ INSERT INTO buildings(picturesPath, name, address, year, summary, rating, catego
 ('assets/pictures/58.jpg', 'Vila Nae Ionescu', 'Bulevardul Ion Ionescu de la Brad', 1930, 'Această vilă a aparținut filosofului Nae Ionescu și este un exemplu de arhitectură interbelică, asociată cu mișcările intelectuale și politice controversate ale vremii. Clădirea se remarcă prin liniile sale moderniste, având o istorie complexă care reflectă turbulențele sociale și ideologice ale anilor 30.', 0, 'manor'),
 
 ('assets/pictures/59.jpg', 'Palatul Nifon Mitropolitul', 'Strada Doamnei', 1900, 'Un palat cu rol istoric și ecleziastic, Palatul Nifon Mitropolitul a servit ca reședință pentru ierarhii bisericești. Arhitectura sa elegantă, în stil eclectic, contribuie la patrimoniul bogat al străzii Doamnei. Clădirea este un martor al influenței bisericii în viața publică și al dezvoltării urbanistice a centrului vechi.', 0, 'palace');
+
+UPDATE buildings SET category = CASE 
+    -- 1. Cultural Buildings / Theaters / Museums (Memorials, Museums, Synagogues, Cinemas)
+    WHEN buildingId IN (1, 2, 3, 4, 5, 6, 7, 19, 46, 53) 
+        THEN 'Cultural Buildings / Theaters / Museums'
+
+    -- 2. Palaces & Royal Residences (Palaces, Large Estates, Royal Homes)
+    WHEN buildingId IN (12, 18, 20, 25, 27, 36, 41, 50, 54, 55, 57, 59) 
+        THEN 'Palaces & Royal Residences'
+
+    -- 3. Historic Houses & Villas (Standard Heritage Housing, Modernist Villas, Conacs)
+    WHEN buildingId IN (11, 15, 16, 22, 23, 24, 26, 30, 32, 35, 37, 38, 40, 44, 49, 58) 
+        THEN 'Historic Houses & Villas'
+
+    -- 4. Neo-Romanian & Art Nouveau Residences (Specific architectural styles)
+    WHEN buildingId IN (17, 31, 43, 45, 47) 
+        THEN 'Neo-Romanian & Art Nouveau Residences'
+
+    -- 5. National/Interwar Period Banks & Financial Palaces
+    WHEN buildingId IN (21, 34, 56) 
+        THEN 'National/Interwar Period Banks & Financial Palaces'
+
+    -- 6. Historic Inns & Caravanserais (Hotels & Markets)
+    WHEN buildingId IN (10, 28, 29, 52) 
+        THEN 'Historic Inns & Caravanserais'
+
+    -- 7. Monuments & Arches (Statues, Industrial Monuments, Chapels, Unique Structures)
+    WHEN buildingId IN (8, 9, 13, 33, 39, 42) 
+        THEN 'Monuments & Arches'
+
+    -- 8. Orthodox Churches & Monasteries
+    WHEN buildingId IN (14, 51) 
+        THEN 'Orthodox Churches & Monasteries'
+
+    -- 9. Communist Era Monuments & Civic Structures (Post-war)
+    WHEN buildingId IN (48) 
+        THEN 'Communist Era Monuments & Civic Structures'
+
+    -- Fallback for safety
+    ELSE category 
+END;
