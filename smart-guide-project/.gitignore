@@ -6,10 +6,10 @@
 /out-tsc
 /bazel-out
 
+/.vs
+
 # Node
 /node_modules
-/src/app/backend/node_modules
-/src/app/backend/authentication/node_modules
 npm-debug.log
 yarn-error.log
 

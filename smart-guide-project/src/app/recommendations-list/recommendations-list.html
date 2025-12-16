@@ -1,1 +1,10 @@
-<p>recommendations-list works!</p>
+<ul *ngIf="dataLoaded" class="recommendation-list">
+  @for(monument of monumentRecommendations; track monument) {
+  <li class="recommendation-card">
+    <img src="{{ monument.picturesPath }}" alt="{{monument.name}}" />
+    <h2>{{ monument.name }}</h2>
+    <button [routerLink]="[monument.name]">
+      Mai multe informații
+    </button>
+  </li> }
+</ul>

@@ -1,0 +1,32 @@
+<div *ngIf="dataLoaded" class="monument-details-container">
+  <button (click)="refresh()" [routerLink]="'/recommendations'">Go back</button>
+  <h2>{{monument?.name}}</h2>
+
+  <div class="monument-description">
+    <img src="{{monument?.picturesPath}}" />
+    <article>{{monument?.summary}}</article>
+  </div>
+
+  <div class="reviews-section">
+    <div class="leave-review-section">
+      <h2>Leave your reviews!</h2>
+      <form [formGroup]="form" (ngSubmit)="submitReview()">
+        <input formControlName="reviewTitle" type="text" placeholder="Review Title" />
+        <textarea formControlName="reviewBody" rows="10" cols="10" placeholder="Review Body"></textarea>
+        <input formControlName="rating" type="number" placeholder="10" min="0" max="10" />
+        <button type="submit">Leave review</button>
+      </form>
+    </div>
+
+    <div class="reviews-section">
+      <h3>Review-uri anonime</h3>
+      @for (review of monumentReviews; track review) {
+      <div class="review">
+        <h2>{{review.title}}</h2>
+        <p>{{review.description}}</p>
+        <p>{{review.rating}} / 10</p>
+      </div>
+      }
+    </div>
+  </div>
+</div>

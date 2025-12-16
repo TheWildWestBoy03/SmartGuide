@@ -1,8 +1,18 @@
-<header id="main-header">
+<ng-container *ngIf="screenState$ | async as state">
+  <header id="main-header">
     <span>SMARTGUIDE</span>
-    <ul class="main-pages-list">
+
+    <ul *ngIf="!state.is800" class="main-pages-list">
       <li *ngFor="let page of pages">
         <a [href]="page.link">{{ page.title }}</a>
-    </li>
+      </li>
     </ul>
-</header>
+
+    <button *ngIf="state.is800" (click)="toggleAppearance()" id="display-list">Display</button>
+  </header>
+  <ul *ngIf="extendedNavbar&&state.is800" class="extended-main-pages-list">
+    <li *ngFor="let page of pages">
+      <a [href]="page.link">{{ page.title }}</a>
+    </li>
+  </ul>
+</ng-container>

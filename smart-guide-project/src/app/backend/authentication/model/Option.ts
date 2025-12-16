@@ -1,7 +1,14 @@
 import { db } from '../config/DatabaseConfig.js';
 import { RowDataPacket, OkPacket } from 'mysql2';
 
+export interface OptionDto {
+  description: string;
+  userId: number;
+  ranking: number;
+  name: string;
+}
 export interface Option {
+  optionId: number,
   description: string;
   userId: number;
   ranking: number;
@@ -29,7 +36,7 @@ export const OptionModel = {
     return rows[0] as Option;
   },
 
-  async insertOption(option: Option): Promise<OkPacket> {
+  async insertOption(option: OptionDto): Promise<OkPacket> {
     const [result] = await db.query<OkPacket>(
       'INSERT INTO options (userId, name, description, ranking) VALUES (?, ?, ?, ?)',
       [option.userId, option.name, option.description, option.ranking]

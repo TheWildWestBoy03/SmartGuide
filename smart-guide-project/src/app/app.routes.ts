@@ -5,31 +5,41 @@ import { LoginPage } from './login-page/login-page';
 import { ItinerariesPage } from './itineraries-page/itineraries-page';
 import { HomePage } from './home-page/home-page';
 import { OptionsPage } from './options-page/options-page';
+import { RecommendationMonumentDetails } from './recommendation-monument-details/recommendation-monument-details';
 
 export const routes: Routes = [
-    {
-        path: 'home',
-        component: HomePage,
-        title: 'Home'
-    }, {
-        path: 'recommendations',
-        component: RecommendationsList,
-        title: 'Recommendations'
-    }, {
-        path: 'sign-in',
-        component: SignInPage,
-        title: 'Sign In'
-    }, {
-        path: 'login',
-        component: LoginPage,
-        title: 'Log in'
-    }, {
-        path: 'itineraries',
-        component: ItinerariesPage,
-        title: 'Itineraries'
-    }, {
-        path: 'options',
-        component: OptionsPage,
-        title: 'Options'
-    }
+  {
+    path: 'home',
+    component: HomePage,
+    title: 'Home'
+  }, {
+    path: 'recommendations',
+    title: 'Recommendations',
+    loadComponent: () =>
+      import('./recommendations-list/recommendations-list').then(
+        (m) => m.RecommendationsList
+      ),
+  }, {
+    path: 'sign-in',
+    component: SignInPage,
+    title: 'Sign In'
+  }, {
+    path: 'login',
+    component: LoginPage,
+    title: 'Log in'
+  }, {
+    path: 'itineraries',
+    component: ItinerariesPage,
+    title: 'Itineraries'
+  }, {
+    path: 'options',
+    component: OptionsPage,
+    title: 'Options'
+  }, {
+    path: 'recommendations/:name',
+    loadComponent: () =>
+      import('./recommendation-monument-details/recommendation-monument-details').then(
+        (m) => m.RecommendationMonumentDetails
+      ),
+  }
 ];
