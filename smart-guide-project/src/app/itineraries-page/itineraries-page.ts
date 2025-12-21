@@ -6,6 +6,7 @@ import { Component } from '@angular/core';
   templateUrl: './itineraries-page.html',
   styleUrl: './itineraries-page.css',
 })
+
 export class ItinerariesPage {
 
 }

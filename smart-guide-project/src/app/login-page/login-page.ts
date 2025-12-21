@@ -26,9 +26,10 @@ export class LoginPage {
       const response = await axios.post(loginUrl, {
         email: formValues.email,
         password: formValues.password,
-      });
+      }, { withCredentials: true });
 
-      console.log(response);
+      window.location.href = '/home';
+
     } catch (error) {
       console.error(error);
     }

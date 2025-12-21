@@ -1,25 +1,31 @@
-<div cdkDropList class="options-list">
-  <div class="options-list-header">
-    <h2>List of Saved Options</h2>
+<ng-container>
+  <div *ngIf="!loggedIn" class="attention-message-container">
+    <p class="attention-message">You need to log in before watching options!</p>
+    <button (click)="loginButtonClick()">Log In</button>
   </div>
-  @for (option of options; track option) {
-  <div class="option">{{option.name}}<button (click)="handleDeleting(option.name)" class="delete-btn">Delete</button></div>
-  }
-
-  <form [formGroup]="form" *ngIf="addingOptions">
-    <h3>Historical Options</h3>
-
-    @for(option of differenceOptions; track option) {
-    <div class="preference-module">
-      <input [formControlName]="option" type="checkbox" id="{{ option }}">
-      <label for="{{ option }}">{{ option }}</label>
+  <div *ngIf="loggedIn" cdkDropList class="options-list">
+    <div class="options-list-header">
+      <h2>List of Saved Options</h2>
     </div>
+    @for (option of options; track option) {
+    <div class="option">{{option.name}}<button (click)="handleDeleting(option.name)" class="delete-btn">Delete</button></div>
     }
-  </form>
 
-  <div class="btns-container">
-    <button *ngIf="!addingOptions" (click)="handleAdding()" class="add-option">Add Options</button>
-    <button *ngIf="addingOptions" (click)="handleAdding()" class="add-option">Close</button>
-    <button (click)="handleSaving()" class="add-option">Save Options</button>
+    <form [formGroup]="form" *ngIf="addingOptions">
+      <h3>Historical Options</h3>
+
+      @for(option of differenceOptions; track option) {
+      <div class="preference-module">
+        <input [formControlName]="option" type="checkbox" id="{{ option }}">
+        <label for="{{ option }}">{{ option }}</label>
+      </div>
+      }
+    </form>
+
+    <div class="btns-container">
+      <button *ngIf="!addingOptions" (click)="handleAdding()" class="add-option">Add Options</button>
+      <button *ngIf="addingOptions" (click)="handleAdding()" class="add-option">Close</button>
+      <button (click)="handleSaving()" class="add-option">Save Options</button>
+    </div>
   </div>
-</div>
+</ng-container>

@@ -1,10 +1,16 @@
-<ul *ngIf="dataLoaded" class="recommendation-list">
-  @for(monument of monumentRecommendations; track monument) {
-  <li class="recommendation-card">
-    <img src="{{ monument.picturesPath }}" alt="{{monument.name}}" />
-    <h2>{{ monument.name }}</h2>
-    <button [routerLink]="[monument.name]">
-      Mai multe informații
-    </button>
-  </li> }
-</ul>
+<ng-container>
+  <div *ngIf="!loggedIn" class="attention-message-container">
+    <p class="attention-message">You need to log in before watching recommendations!</p>
+    <button (click)="loginButtonClick()">Log In</button>
+  </div>
+  <ul *ngIf="dataLoaded" class="recommendation-list">
+    @for(monument of monumentRecommendations; track monument) {
+    <li class="recommendation-card">
+      <img src="{{ monument.picturesPath }}" alt="{{monument.name}}" />
+      <h2>{{ monument.name }}</h2>
+      <button [routerLink]="[monument.name]">
+        Mai multe informații
+      </button>
+    </li> }
+  </ul>
+</ng-container>

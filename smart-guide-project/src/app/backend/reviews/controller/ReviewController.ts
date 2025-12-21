@@ -4,6 +4,7 @@ import { ReviewModel, Review, ReviewDto } from '../model/ReviewModel.js'
 export const reviewController = {
   async createReview(req: Request, res: Response) {
     const { userId, buildingId, title, description, rating } = req.body;
+
     const newReview: ReviewDto = {
       userId, buildingId, title, description, rating
     };

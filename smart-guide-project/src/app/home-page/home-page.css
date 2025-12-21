@@ -1,0 +1,18 @@
+.home-page-container {
+  background: #296;
+  color: black;
+  width: 75%;
+  font-weight: 500;
+  font-family: Rockwell;
+  font-size: 24px;
+  border-radius: 16px;
+  border: 6px solid black;
+  padding: 32px;
+  margin: 16px auto;
+}
+
+@media screen and (max-width: 600px) {
+  .home-page-container {
+    font-size: 16px;
+  }
+}

@@ -28,6 +28,13 @@ export const MonumentModel = {
     const [rows] = await db.query("select * from buildings");
     return rows as Monument[];
   },
+  async getAllByUser(email: number): Promise<Monument[]> {
+    const [rows] = await db.query("select b.* from buildings b \
+                                  inner join options o on b.category=o.name \
+                                  inner join users u on o.userId = u.userId \
+                                  where u.email = ?", [email]);
+    return rows as Monument[];
+  },
 
   async findOneByName(name: String): Promise<Monument | null> {
     try {

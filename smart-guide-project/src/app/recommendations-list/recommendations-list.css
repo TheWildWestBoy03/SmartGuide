@@ -49,3 +49,30 @@
     .recommendation-card button:hover {
       background: #aaa;
     }
+
+.attention-message-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 3px solid black;
+  background: #296;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.attention-message {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.attention-message-container > button {
+  border: 3px solid black;
+  border-radius: 16px;
+  padding: 8px 48px;
+  display: block;
+  cursor: pointer;
+  margin: 16px auto;
+  background: #e7d156;
+}

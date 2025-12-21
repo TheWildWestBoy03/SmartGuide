@@ -70,7 +70,7 @@ export const userController = {
         res.cookie('access-token', token, {
           httpOnly: true,
           secure: false,
-          sameSite: 'strict',
+          sameSite: 'lax',
           maxAge: 3600000
         })
 
@@ -91,5 +91,27 @@ export const userController = {
     const user = await UserModel.findById(userId);
 
     response.json(user);
+  },
+
+  async getUserStatus(request: Request, response: Response) {
+    const userCookie = request.cookies['access-token'];
+
+    try {
+      const decoded = jwt.verify(userCookie, process.env['ACCESS_TOKEN_SECRET']!);
+      response.status(201).json(decoded);
+    } catch (errors) {
+      console.log(errors);
+      response.status(403).json(errors);
+    }
+  },
+
+  async logoutUser(request: Request, response: Response) {
+    response.clearCookie('access-token');
+    response.status(201).send("User logout");
+  },
+
+  async findUserIdByEmail(request: Request, response: Response) {
+    const user = await UserModel.findOneByEmail(request.body.email);
+    response.json(user?.userId);
   }
 }

@@ -1,15 +1,16 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()" class="log-in-container">
-    <h3>Log In Here</h3>
-    <fieldset id="login-information">
-        <div class="information-module">
-             <label for="email"> Email: </label>
-            <input formControlName="email" type="email" id="email" placeholder="example@gmail.com">
-        </div>
-        <div class="information-module">
-            <label for="password"> Password: </label>
-            <input formControlName="password" type="password" id="password" placeholder="********" minlength="10">
-        </div>
-    </fieldset>
+  <h3>Log In Here</h3>
+  <fieldset id="login-information">
+    <div class="information-module">
+      <label for="email"> Email: </label>
+      <input formControlName="email" type="email" id="email" placeholder="example@gmail.com">
+    </div>
+    <div class="information-module">
+      <label for="password"> Password: </label>
+      <input formControlName="password" type="password" id="password" placeholder="********" minlength="10">
+    </div>
+  </fieldset>
 
-    <button type="submit">Log In</button>
+  <button type="submit">Log In</button>
+  <p id="log-in-paragraph">No account? Press <a href="/sign-in" id="to-sign-in-anchor">here</a> to sign up.</p>
 </form>

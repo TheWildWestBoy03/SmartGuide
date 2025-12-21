@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
 import { FormGroup, FormControl } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import axios from 'axios'
+import { AuthService } from '../auth-service'
 
 @Component({
   selector: 'app-recommendation-monument-details',
@@ -22,6 +23,8 @@ export class RecommendationMonumentDetails {
   monumentName: string | null = null;
   dataLoaded: boolean = false;
   monumentReviews: Review[] = [];
+
+  authService = inject(AuthService);
 
   form = new FormGroup({
     reviewTitle: new FormControl('', { nonNullable: true }),
@@ -47,7 +50,7 @@ export class RecommendationMonumentDetails {
     });
   }
 
-  ngOnInit(): void {
+  async ngOnInit() {
     const url = "http://localhost:3000/api/reviews/information/one";
 
     this.http.post<Monument>(url, { name: this.monumentName }).subscribe({
@@ -58,7 +61,6 @@ export class RecommendationMonumentDetails {
         this.changeRef.detectChanges();
 
         this.fetchReviews();
-
       },
       error: (err) => console.error(err)
     });
@@ -78,9 +80,11 @@ export class RecommendationMonumentDetails {
       return;
     }
 
+    const userId = await this.authService.getId();
+
     try {
       const url = "http://localhost:3000/api/reviews/information/review";
-      await axios.post(url, { userId: 1, buildingId: this.monument?.buildingId, title: values.reviewTitle, description: values.reviewBody, rating: values.rating });
+      await axios.post(url, { userId, buildingId: this.monument?.buildingId, title: values.reviewTitle, description: values.reviewBody, rating: values.rating });
       this.changeRef.detectChanges();
       this.fetchReviews();
     } catch (error) {

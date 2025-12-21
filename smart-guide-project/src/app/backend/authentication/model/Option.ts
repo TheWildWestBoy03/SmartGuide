@@ -43,5 +43,22 @@ export const OptionModel = {
     );
 
     return result;
+  },
+
+  async insertUserOption(option: OptionDto): Promise<OkPacket> {
+    const [result] = await db.query<OkPacket>(
+      'INSERT INTO options (userId, name, description, ranking) VALUES (?, ?, ?, ?)',
+      [option.userId, option.name, option.description, option.ranking]
+    );
+
+    return result;
+  },
+
+  async deleteAll(userId: number): Promise<OkPacket> {
+    const [result] = await db.query<OkPacket>(
+      'delete from options where userId = ?', [userId]
+    );
+
+    return result;
   }
 };

@@ -2,17 +2,30 @@
   <header id="main-header">
     <span>SMARTGUIDE</span>
 
-    <ul *ngIf="!state.is800" class="main-pages-list">
-      <li *ngFor="let page of pages">
-        <a [href]="page.link">{{ page.title }}</a>
+    <ul *ngIf="!state.is800 && !loggedIn" class="main-pages-list">
+      <li *ngFor="let page of loggedOutPages">
+        <a [href]="page.link" (click)="onPageClick(page.title)">{{ page.title }}</a>
+      </li>
+    </ul>
+
+    <ul *ngIf="!state.is800 && loggedIn" class="main-pages-list">
+      <li *ngFor="let page of loggedInPages">
+        <a [href]="page.link" (click)="onPageClick(page.title)">
+          {{ page.title }}
+        </a>
       </li>
     </ul>
 
     <button *ngIf="state.is800" (click)="toggleAppearance()" id="display-list">Display</button>
   </header>
-  <ul *ngIf="extendedNavbar&&state.is800" class="extended-main-pages-list">
-    <li *ngFor="let page of pages">
-      <a [href]="page.link">{{ page.title }}</a>
+  <ul *ngIf="extendedNavbar&&state.is800 && !loggedIn" class="extended-main-pages-list">
+    <li *ngFor="let page of loggedOutPages">
+      <a [href]="page.link" (click)="onPageClick(page.title)">{{ page.title }}</a>
     </li>
+  </ul>
+
+  <ul *ngIf="extendedNavbar&&state.is800 && loggedIn" class="extended-main-pages-list">
+    <li *ngFor="let page of loggedInPages">
+      <a [href]="page.link" (click)="onPageClick(page.title)">{{ page.title }}</a>
   </ul>
 </ng-container>

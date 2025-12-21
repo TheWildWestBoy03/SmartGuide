@@ -6,6 +6,8 @@ import { FormGroup, FormControl } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import axios from 'axios'
+import { AuthService } from '../auth-service'
 
 @Component({
   selector: 'app-options-page',
@@ -16,8 +18,10 @@ import { HttpClient } from '@angular/common/http';
 })
 
 export class OptionsPage {
+  authService = inject(AuthService);
   options: Option[] = [];
   http = inject(HttpClient);
+  loggedIn: boolean = false;
 
   serializedOptions: string[] = [];
   differenceOptions: string[] = [];
@@ -46,14 +50,16 @@ export class OptionsPage {
   constructor(private changeDetectorRef: ChangeDetectorRef) { }
 
   async getUserOptions() {
+    const userStatusUrl = "http://localhost:3000/api/auth/status";
+    const userId = await this.authService.getId();
+
     const optionsRetrievalUrl = "http://localhost:3000/api/reviews/options";
-    this.http.post<Option[]>(optionsRetrievalUrl, { userId: 1 }).subscribe({
+    this.http.post<Option[]>(optionsRetrievalUrl, { userId }).subscribe({
       next: (data) => {
         this.options = data as Option[];
-        console.log(this.options);
         this.changeDetectorRef.detectChanges();
       },
-      error: (err) => console.log(err)
+      error: (err) => console.log("")
     });
   }
 
@@ -73,7 +79,6 @@ export class OptionsPage {
       this.differenceOptions.map(option => [option, new FormControl(false, { nonNullable: true })])
     );
 
-    // Assign the new FormGroup
     this.form = new FormGroup(newControls);
 
     this.changeDetectorRef.detectChanges();
@@ -93,33 +98,41 @@ export class OptionsPage {
     // Assign the new FormGroup
     this.form = new FormGroup(newControls);
 
-    console.log(this.historicalCategories.length);
     this.changeDetectorRef.detectChanges();
   }
 
-  handleSaving() {
+  async handleSaving() {
     this.addingOptions = false;
 
     const finalChoose = this.serializedOptions.concat(this.selectedValues);
-    console.log(finalChoose);
 
     const optionalSavingUrl = "http://localhost:3000/api/reviews/options/save";
+    const userId = await this.authService.getId();
 
-    this.http.post<Option[]>(optionalSavingUrl, { userId: 1, options: finalChoose}).subscribe({
+    this.http.post<Option[]>(optionalSavingUrl, { userId, options: finalChoose}).subscribe({
       next: (data) => {
         this.options = data as Option[];
-        console.log(this.options);
         this.changeDetectorRef.detectChanges();
       },
-      error: (err) => console.log(err)
+      error: (err) => console.log("")
     });
 
     this.changeDetectorRef.detectChanges();
     window.location.reload();
   }
 
-  ngOnInit(): void {
-    this.getUserOptions();
-    this.changeDetectorRef.detectChanges();
+  async ngOnInit() {
+    const userStatusUrl = "http://localhost:3000/api/auth/status";
+    const result = await axios.post(userStatusUrl, {}, { withCredentials: true });
+
+    if (result.status === 201) {
+      this.loggedIn = true;
+      this.getUserOptions();
+      this.changeDetectorRef.detectChanges();
+    }
+  }
+
+  loginButtonClick() {
+    window.location.href = "/login";
   }
 }

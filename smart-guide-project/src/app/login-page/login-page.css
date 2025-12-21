@@ -1,89 +1,102 @@
 .log-in-container {
-    margin: 40px auto;
-    width: 600px;
-    border: 8px solid #296;
-    border-radius: 16px;
-    background-color: #276;
-    font-size: 1.5rem;
-    font-family: sans-serif;
-    padding: 16px;
+  margin: 40px auto;
+  width: 600px;
+  border: 8px solid #296;
+  border-radius: 16px;
+  background-color: #276;
+  font-size: 1.5rem;
+  font-family: sans-serif;
+  padding: 16px;
 }
 
-.log-in-container h3 {
+  .log-in-container h3 {
     text-align: center;
     font-weight: bold;
     margin: 8px 0;
-}
+  }
 
-@media screen and (max-width: 800px){
-    .log-in-container {
-        width: 70%;
-        min-width: 450px;
-    }
+@media screen and (max-width: 800px) {
+  .log-in-container {
+    width: 70%;
+    min-width: 450px;
+  }
 
     .log-in-container label {
-        font-size: 16px;
+      font-size: 16px;
     }
 }
 
 .information-module {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    margin-top: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 16px;
 }
 
 
-.information-module:last-of-type {
+  .information-module:last-of-type {
     margin-bottom: 8px;
-}
+  }
 
-.information-module > label {
+  .information-module > label {
     margin-right: 16px;
     font-size: 16px;
-}
+  }
 
 .preference-module {
-    display: flex;
-    align-items: center;
-    margin: 2px 0;
+  display: flex;
+  align-items: center;
+  margin: 2px 0;
 }
 
-.preference-module > label {
+  .preference-module > label {
     margin-left: 16px;
     font-size: 16px;
-}
+  }
 
-.preference-module > input {
+  .preference-module > input {
     zoom: 1.5;
-}
+  }
 
 .information-module input {
-    margin-right: 0;
-    background: white;
-    display: flex;
-    align-items: center;
-    line-height: inherit;
-    color: black;
-    width: 75%;
-    font-size: 1rem;
-    padding: 8px;
-    line-height: 1rem;
-    border-radius: 4px;
+  margin-right: 0;
+  background: white;
+  display: flex;
+  align-items: center;
+  line-height: inherit;
+  color: black;
+  width: 75%;
+  font-size: 1rem;
+  padding: 8px;
+  line-height: 1rem;
+  border-radius: 4px;
 }
 
-.information-module input[type="number"] {
+  .information-module input[type="number"] {
     width: 10%;
-}
+  }
 
 .log-in-container button {
-    padding: 8px;
-    color: white;
-    margin: 16px auto 0 auto;
-    display: block;
-    font-weight: bold;
-    border: 4px solid #296;
-    cursor: pointer;
-    border-radius: 4px;
+  padding: 8px;
+  color: white;
+  margin: 16px auto 0 auto;
+  display: block;
+  font-weight: bold;
+  border: 4px solid #296;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+#log-in-paragraph {
+  font-size: 15px;
+  font-weight: 500;
+  text-align: center;
+  margin-top: 8px;
+}
+
+#to-sign-in-anchor {
+  color: black;
+  text-decoration: underline;
+  font-weight: 500;
 }

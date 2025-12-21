@@ -9,5 +9,9 @@ export const monumentController = {
   async getMonumentByName(req: Request, res: Response) {
     const monument = await MonumentModel.findOneByName(req.body.name);
     res.json(monument);
+  },
+  async getMonumentsByUser(req: Request, res: Response) {
+    const monuments = await MonumentModel.getAllByUser(req.body.email);
+    res.json(monuments);
   }
 }
