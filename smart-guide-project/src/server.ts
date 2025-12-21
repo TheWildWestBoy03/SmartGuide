@@ -7,6 +7,18 @@ import {
 import express from 'express';
 import { join } from 'node:path';
 
+global['ResizeObserver'] = class ResizeObserver {
+  observe() { }
+  unobserve() { }
+  disconnect() { }
+};
+
+// 2. Sometimes 'window' or 'document' are also needed by map libraries
+if (!global['window']) {
+  // @ts-ignore
+  global['window'] = global;
+}
+
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();

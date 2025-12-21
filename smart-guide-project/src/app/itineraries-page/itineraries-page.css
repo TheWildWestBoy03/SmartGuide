@@ -1,0 +1,11 @@
+.container {
+  display: flex;
+  height: calc(100vh - 200px);
+  width: 75%;
+}
+
+/* Map view styling */
+.map-view {
+  flex: 1; /* Takes up the remaining space next to the sidebar */
+  height: 100%;
+}
