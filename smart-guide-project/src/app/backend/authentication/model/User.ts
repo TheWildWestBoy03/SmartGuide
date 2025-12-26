@@ -5,7 +5,8 @@ export interface UserDto {
   firstName: String;
   lastName: String;
   password: String;
-  email: String;
+  email: string;
+  isAdmin: boolean;
   options: String[];
 }
 export interface User {
@@ -13,20 +14,22 @@ export interface User {
   firstName: String;
   lastName: String;
   password: String;
-  email: String;
+  email: string;
+  isAdmin: boolean;
   options: String[];
 }
 
 
 export const UserModel = {
-  async getAll(): Promise<UserDto[]> {
+  async getAll(): Promise<User[]> {
     const [rows] = await db.query("select * from users");
+
     return rows as User[];
   },
 
   async create(user: UserDto): Promise<OkPacket> {
-    const [result] = await db.query<OkPacket>("insert into users (firstname, lastname, email, password) values (?, ?, ?, ?) ", [
-      user.firstName, user.lastName, user.email, user.password
+    const [result] = await db.query<OkPacket>("insert into users (firstname, lastname, email, password, isAdmin) values (?, ?, ?, ?, ?) ", [
+      user.firstName, user.lastName, user.email, user.password, false
     ]);
 
     return result as OkPacket;
@@ -50,5 +53,10 @@ export const UserModel = {
     } catch (error) {
       return null;
     }
+  },
+
+  async deleteUser(email: String): Promise<OkPacket> {
+    const [result] = await db.query<OkPacket>("delete from users where email = ?", [email]);
+    return result;
   }
 }

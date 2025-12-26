@@ -63,6 +63,21 @@ export class AuthService {
     }
   }
 
+  async getUserDetails(): Promise<User | null> {
+    if (!this.cachedId) {
+      this.cachedId = await this.getId();
+    }
+
+    const userRetrievalUrl = "http://localhost:3000/api/auth/user-retrieve";
+    const response = await lastValueFrom(
+      this.http.post<AuthResponse>(userRetrievalUrl, { userId: this.cachedId }, { withCredentials: true })
+    );
+
+    const user: any = response;
+
+    return user as User;
+  }
+
   logout() {
     this.cachedEmail = null;
   }

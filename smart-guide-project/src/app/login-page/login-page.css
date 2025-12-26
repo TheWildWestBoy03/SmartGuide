@@ -88,6 +88,11 @@
   border-radius: 4px;
 }
 
+.error-paragraph {
+  color: red;
+  margin: 8px auto;
+}
+
 #log-in-paragraph {
   font-size: 15px;
   font-weight: 500;

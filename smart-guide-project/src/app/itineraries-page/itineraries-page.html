@@ -1,3 +1,12 @@
-<div class="container">
-  <div #mapViewNode class="map-view"></div>
+<div class="main-wrapper">
+  <div class="container">
+    <div id="my-zoom-container"></div>
+    <div id="my-search-container"></div>
+
+    <div #mapViewNode class="map-view"></div>
+  </div>
+
+  <button (click)="generateNewItineraryRoute()" class="generate-itinerary-btn">
+    Generate New Itinerary
+  </button>
 </div>

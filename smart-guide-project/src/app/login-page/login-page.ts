@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormGroup, FormControl } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -13,10 +13,14 @@ import axios from 'axios';
 })
 
 export class LoginPage {
+  incorrectPassword: boolean = false;
+  userNotFound: boolean = false;
+
   form = new FormGroup({
     email: new FormControl('', { nonNullable: true }),
     password: new FormControl('', { nonNullable: true }),
   });
+  constructor(private changeRef: ChangeDetectorRef) { }
 
   async onSubmit() {
     const loginUrl: string = "http://localhost:3000/api/auth/login";
@@ -28,10 +32,24 @@ export class LoginPage {
         password: formValues.password,
       }, { withCredentials: true });
 
+      console.log(response);
       window.location.href = '/home';
 
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      if (error.response.status === 404) {
+        this.userNotFound = true;
+        this.incorrectPassword = false;
+
+        console.log("Incorrect user");
+
+        this.changeRef.detectChanges();
+      } else if (error.response.status === 401) {
+        this.incorrectPassword = true;
+        this.userNotFound = false;
+
+        console.log("Incorrect password");
+        this.changeRef.detectChanges();
+      }
     }
   }
 }

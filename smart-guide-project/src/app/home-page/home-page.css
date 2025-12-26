@@ -11,8 +11,104 @@
   margin: 16px auto;
 }
 
+.profile-page {
+  height: fit-content;
+  width: 100%;
+  background: cornflowerblue;
+  padding: 32px 0;
+}
+
+  .profile-page > p {
+    text-align: left;
+    font-family: Rockwell;
+    font-size: 20px;
+    font-weight: 600;
+    width: 75%;
+    height: fit-content;
+    margin: 0 auto;
+    background: white;
+    margin-bottom: 8px;
+    padding: 16px;
+    overflow-wrap: break-word;
+  }
+
+  .profile-page > h1 {
+    text-align: center;
+    margin-bottom: 64px;
+    font-size: 32px;
+    font-weight: 700;
+  }
+
+.user-information {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  border: 2px solid black;
+  border-radius: 6px;
+  margin: 16px auto;
+}
+
+.delete-user-btn {
+  padding: 8px;
+  border: 2px solid black;
+  border-radius: 8px;
+  font-weight: 500;
+  font-family: Rockwell;
+  cursor: pointer;
+  background: #2ee8ef;
+}
+
+.itinerary-description-container {
+  padding: 16px;
+  font-size: 20px;
+  font-family: Rockwell;
+  font-weight: 500;
+  border: 4px solid black;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.itineraries-section > p {
+  text-align: center;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 48px;
+}
+
+.itineraries-section {
+  background: white;
+  width: 90%;
+  margin: 48px auto;
+  padding: 48px;
+  border-radius: 100px;
+}
+
+.buildings-list {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+  .buildings-list span:last-of-type {
+    display: none;
+  }
+
 @media screen and (max-width: 600px) {
   .home-page-container {
     font-size: 16px;
+  }
+}
+
+@media screen and (max-width: 1000px) {
+  .user-information {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .delete-user-btn {
+    margin-top: 16px;
+    padding: 4px;
+    width: 100%;
   }
 }

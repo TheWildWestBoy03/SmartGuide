@@ -16,6 +16,7 @@ CREATE TABLE users (
     lastName VARCHAR(100) NOT NULL,
     email VARCHAR(50) NOT NULL,
     password VARCHAR(200) NOT NULL,
+    isAdmin BOOLEAN,
     startedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -241,3 +242,5 @@ UPDATE buildings SET category = CASE
     -- Fallback for safety
     ELSE category 
 END;
+
+insert into users (firstName, lastName, email, password, isAdmin) values ('admin', 'admin', 'admin@gmail.com', 'admin', true);

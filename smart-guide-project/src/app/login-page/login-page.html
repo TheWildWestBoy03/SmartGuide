@@ -12,5 +12,7 @@
   </fieldset>
 
   <button type="submit">Log In</button>
+  <p class="error-paragraph" *ngIf="incorrectPassword">Your password is incorrect!</p>
+  <p class="error-paragraph" *ngIf="userNotFound">User not found!</p>
   <p id="log-in-paragraph">No account? Press <a href="/sign-in" id="to-sign-in-anchor">here</a> to sign up.</p>
 </form>

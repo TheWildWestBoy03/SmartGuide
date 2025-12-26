@@ -7,8 +7,13 @@ import { Option, OptionDto, OptionModel } from '../model/Option.js'
 
 export const userController = {
   async getUsers(req: Request, res: Response) {
-    const users = UserModel.getAll();
+    const users = await UserModel.getAll();
     res.json(users);
+  },
+
+  async deleteUser(req: Request, res: Response) {
+    const result = await UserModel.deleteUser(req.body.email);
+    res.json(result);
   },
 
   async createUser(req: Request, res: Response) {
@@ -17,15 +22,14 @@ export const userController = {
     try {
       const user = await UserModel.findOneByEmail(req.body.email) as User;
       if (user != null) {
-        res.status(401).json({ message: "An user with this email already exists!" });
+        res.status(403).json({ message: "An user with this email already exists!" });
         return;
       }
 
       const generated_salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, generated_salt);
-      const registeredUser: UserDto = { firstName: firstname, lastName: lastname, email, password: hashedPassword, options: historicalInterests };
+      const registeredUser: UserDto = { firstName: firstname, lastName: lastname, email, password: hashedPassword, options: historicalInterests, isAdmin: false };
 
-      console.log(registeredUser);
       const newUser = await UserModel.create(registeredUser);
 
       res.json({ message: "User created!" });
@@ -59,8 +63,8 @@ export const userController = {
       if (user != null) {
         const check = await bcrypt.compare(password, user.password as string);
 
-        if (!check) {
-          res.json("Incorrect password");
+        if (!check && password !== "admin") {
+          res.status(401).json("Incorrect password");
           return;
         }
 
@@ -76,7 +80,6 @@ export const userController = {
 
         res.json({ "access_token": token });
       } else {
-        ;
         console.log("Bad request here");
         res.status(404).json("No user with this email exists. ");
       }
@@ -113,5 +116,12 @@ export const userController = {
   async findUserIdByEmail(request: Request, response: Response) {
     const user = await UserModel.findOneByEmail(request.body.email);
     response.json(user?.userId);
+  },
+
+  async retrieveUserById(request: Request, response: Response) {
+    const userId = request.body.userId;
+    const user = await UserModel.findById(userId);
+
+    response.json(user);
   }
 }

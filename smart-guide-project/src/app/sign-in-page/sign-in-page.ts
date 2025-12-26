@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormGroup, FormControl } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -16,29 +16,30 @@ import axios from 'axios';
 
 export class SignInPage {
   protected historicalOptions = [
-    "Palaces & Royal Residences", "Orthodox Churches & Monasteries", 
+    "Palaces & Royal Residences", "Orthodox Churches & Monasteries",
     "Cultural Buildings / Theaters / Museums", "Historic Houses & Villas",
     "Fortifications / Old Courts", "Monuments & Arches"
   ];
 
+  userExists: boolean = false;
   form = new FormGroup({
-      firstname: new FormControl('', { nonNullable: true }),
-      lastname: new FormControl('', { nonNullable: true }),
-      email: new FormControl('', { nonNullable: true }),
-      password: new FormControl('', { nonNullable: true }),
+    firstname: new FormControl('', { nonNullable: true }),
+    lastname: new FormControl('', { nonNullable: true }),
+    email: new FormControl('', { nonNullable: true }),
+    password: new FormControl('', { nonNullable: true }),
 
-      ...Object.fromEntries(this.historicalOptions.map(
-        option => [option, new FormControl(false, { nonNullable: true })]
-      ))
-    }
+    ...Object.fromEntries(this.historicalOptions.map(
+      option => [option, new FormControl(false, { nonNullable: true })]
+    ))
+  }
   );
-
+  constructor(private changeRef: ChangeDetectorRef) { }
   get selectedValues() {
     return this.historicalOptions.filter(opt => this.form.get(opt)?.value === true);
   }
 
   async onSubmit() {
-    const authenticationUrl : string = "http://localhost:3000/api/auth/register";
+    const authenticationUrl: string = "http://localhost:3000/api/auth/register";
     const formValues = this.form.value;
 
     try {
@@ -50,8 +51,16 @@ export class SignInPage {
         historicalInterests: this.selectedValues
       });
 
-    } catch (error) {
+      if (response.status === 200) {
+        window.location.href = '/login';
+      }
+    } catch (error: any) {
       console.error(error);
+
+      if (error.response.status === 403) {
+        this.userExists = true;
+        this.changeRef.detectChanges();
+      }
     }
   }
 }

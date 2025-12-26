@@ -1,5 +1,43 @@
-<div class="home-page-container">
-  <p class="home-page-description">
-    Transformă-ți plimbarea într-o adevărată călătorie în timp cu SmartGuide. Nu ne limităm doar la a-ți arăta direcția; noi construim traseul narativ ideal printre cele mai spectaculoase obiective istorice ale orașului. Indiferent dacă ai la dispoziție două ore sau două zile, motorul nostru inteligent de rutare generează un itinerariu fluid, adaptat perfect ritmului tău. Pătrunde în adâncurile trecutului prin contexte istorice bogate, descoperă legende ascunse și află impresiile altor exploratori prin recenzii autentice. Nu mai pierde timpul privind hărțile – începe să trăiești istoria.
-  </p>
-</div>
+<ng-container>
+  <div *ngIf="!loggedInUser" class="home-page-container">
+    <p class="home-page-description">
+      Transformă-ți plimbarea într-o adevărată călătorie în timp cu SmartGuide. Nu ne limităm doar la a-ți arăta direcția; noi construim traseul narativ ideal printre cele mai spectaculoase obiective istorice ale orașului. Indiferent dacă ai la dispoziție două ore sau două zile, motorul nostru inteligent de rutare generează un itinerariu fluid, adaptat perfect ritmului tău. Pătrunde în adâncurile trecutului prin contexte istorice bogate, descoperă legende ascunse și află impresiile altor exploratori prin recenzii autentice. Nu mai pierde timpul privind hărțile – începe să trăiești istoria.
+    </p>
+  </div>
+
+  <div *ngIf="loggedInUser" class="profile-page">
+    <h1>User Profile</h1>
+    <p *ngIf="loggedInUser && currentUser">
+      {{currentUser.firstName + " " + currentUser.lastName}}
+    </p>
+
+    <p *ngIf="loggedInUser && currentUser">
+      {{currentUser.email}}
+    </p>
+
+    <p *ngIf="admin">
+      @for (user of systemUsers; track user) {
+      <div class="user-information">
+        <span>{{user.firstName + " " + user.lastName + " - " + user.email}}</span>
+        <button class="delete-user-btn" (click)="deleteUser(user.email)">Delete User</button>
+      </div>
+      }
+    </p>
+    <div *ngIf="!admin" class="itineraries-section">
+      <p class="itineraries-section-title">Itineraries Information Section</p>
+      @for (itinerary of userItineraries; track itinerary) {
+      <div class="itinerary-description-container">
+        <span>The itinerary distance is: {{itinerary.distance}} km.</span>
+        <p class="buildings-list">
+          @for (buildingName of itinerary.buildings; track buildingName) {
+          <span>{{buildingName}}</span>
+          <span>-></span>
+          }
+        </p>
+      </div>
+      }
+    </div>
+  </div>
+</ng-container>
+
+

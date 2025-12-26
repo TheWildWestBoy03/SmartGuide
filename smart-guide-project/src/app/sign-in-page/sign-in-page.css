@@ -15,6 +15,11 @@
     margin: 8px 0;
   }
 
+.error-paragraph {
+  color: red;
+  margin: 8px auto;
+}
+
 @media screen and (max-width: 800px) {
   .sign-in-container {
     width: 70%;

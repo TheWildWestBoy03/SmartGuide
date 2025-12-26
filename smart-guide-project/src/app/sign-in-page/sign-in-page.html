@@ -31,5 +31,6 @@
   </fieldset>
 
   <button type="submit">Sign In</button>
+  <p class="error-paragraph" *ngIf="userExists">User already exists!</p>
   <p id="sign-in-paragraph">Already have an account? Press <a href="/login" id="to-login-anchor">here</a> to log in.</p>
 </form>

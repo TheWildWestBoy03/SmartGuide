@@ -9,5 +9,7 @@ router.post("/login", userController.loginUser);
 router.post("/status", userController.getUserStatus);
 router.post("/logout", userController.logoutUser);
 router.post("/get-user", userController.findUserIdByEmail);
+router.post("/user-retrieve", userController.retrieveUserById);
+router.post("/delete", userController.deleteUser);
 
 export default router;

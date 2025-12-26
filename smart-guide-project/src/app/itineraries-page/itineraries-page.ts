@@ -3,15 +3,16 @@ import {
   OnInit,
   ViewChild,
   ElementRef,
-  OnDestroy
+  OnDestroy,
+  inject
 } from '@angular/core';
 
 import esri = __esri;
+import esriConfig from "@arcgis/core/config";
 
 import WebMap from "@arcgis/core/WebMap";
 import MapView from "@arcgis/core/views/MapView";
 import Search from "@arcgis/core/widgets/Search";
-
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import Graphic from "@arcgis/core/Graphic";
 import Point from "@arcgis/core/geometry/Point";
@@ -22,6 +23,14 @@ import FeatureSet from "@arcgis/core/rest/support/FeatureSet";
 import RouteParameters from "@arcgis/core/rest/support/RouteParameters";
 import * as route from "@arcgis/core/rest/route";
 import * as locator from "@arcgis/core/rest/locator";
+import Zoom from "@arcgis/core/widgets/Zoom";
+
+import axios from 'axios'
+import { AuthService } from '../auth-service'
+import { Monument } from '../backend/reviews/model/MonumentModel';
+import { Itinerary } from '../backend/reviews/model/ItineraryModel';
+
+//esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurGT8HsxDQZv0a-E5-Pp4xAkozU8OAnR5uJIVOrfwfayqZwyQ02UwOyDLFZq_9Yulma9sfefRFFQbJbP0uLHGxClsEss4Xr91H2LFDvT8LauK1DJCi5lA4NecajERkMoymfKAQb-Gf730NbwZhBXNcvJzVN_y31BaUXHqZOq62EPMA9Ytw2hTQLRUOoPDBbZfWZO4SB3dhPaa63d5IU761MxtHYtTkZhCktKRUT9ODrIsAT1_eTw0FYWI";
 
 @Component({
   selector: 'app-itineraries-page',
@@ -32,9 +41,15 @@ import * as locator from "@arcgis/core/rest/locator";
 export class ItinerariesPage implements OnInit, OnDestroy {
   @ViewChild("mapViewNode", { static: true }) private mapViewEl!: ElementRef;
 
+  // user related monuments
+  userMonuments: Monument[] = [];
+  userEmail: string = "";
+
   // Initialize view as null
   private view: MapView | null = null;
+  authService = inject(AuthService);
   map!: esri.Map;
+  itineraryBuildingsNames: String[] = [];
 
   // Layers
   graphicsLayer!: esri.GraphicsLayer;
@@ -48,9 +63,124 @@ export class ItinerariesPage implements OnInit, OnDestroy {
   loaded = false;
   directionsElement: any;
 
-  ngOnInit() {
-    if (typeof window !== "undefined") { // Fixed 'undefined' check
+  async ngOnInit() {
+    if (typeof window !== "undefined") {
       this.initializeMap();
+
+      const monumentsRetrievalUrl = "http://localhost:3000/api/reviews/monument-by-user";
+      const userEmail = await this.authService.getEmail();
+      const response = await axios.post(monumentsRetrievalUrl, { email: userEmail });
+      this.userMonuments = response.data as Monument[];
+    }
+  }
+
+  async generateNewItineraryRoute() {
+    if (!this.view || !this.monumentsLayer) return;
+
+    const routeUrl = "https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World";
+
+    try {
+      // 1. Define the center of Bucharest as the reference point
+      const bucharestCenter = new Point({
+        longitude: 26.1024,
+        latitude: 44.4268
+      });
+
+      // 2. Fetch user's monument list
+      const userMonuments = this.userMonuments;
+
+      if (!userMonuments || userMonuments.length === 0) {
+        this.monumentsLayer.definitionExpression = "1=2";
+        return;
+      }
+
+      const cleanNames = userMonuments.map(m => m.name.replace(/"/g, "").replace(/'/g, "''"));
+
+      // 3. Configure the Proximity Query centered on Bucharest
+      const query = this.monumentsLayer.createQuery();
+      query.where = `name IN ('${cleanNames.join("','")}')`;
+      query.geometry = bucharestCenter;
+      query.distance = 3;
+      query.units = "kilometers";
+      query.spatialRelationship = "intersects";
+      query.outFields = ["OBJECTID", "name"];
+      query.returnGeometry = true;
+
+      const result = await this.monumentsLayer.queryFeatures(query);
+
+      if (result.features.length > 0) {
+        let selectedFeatures: esri.Graphic[] = [];
+        if (result.features.length > 3) {
+          selectedFeatures = result.features.sort(() => Math.random() - 0.5).slice(0, 3);
+        } else {
+          selectedFeatures = result.features;
+        }
+
+        const ids = selectedFeatures.map(f => f.attributes.OBJECTID || f.attributes.ObjectId);
+        this.itineraryBuildingsNames = selectedFeatures.map(f => f.attributes.name);
+
+        this.monumentsLayer.definitionExpression = `OBJECTID IN (${ids.join(",")})`;
+
+        const centerGraphic = new Graphic({
+          geometry: bucharestCenter,
+          symbol: {
+            type: "simple-marker",
+            style: "cross",
+            cap: "round",
+            join: "round",
+            color: [255, 0, 0],
+            size: 12,
+            outline: { color: [255, 255, 255], width: 2 }
+          } as any
+        });
+
+        this.graphicsLayerRoutes.removeAll();
+        this.graphicsLayerUserPoints.removeAll();
+        this.graphicsLayerUserPoints.add(centerGraphic);
+
+        const routeStops = [centerGraphic, ...selectedFeatures];
+        await this.calculateRouteFromFeatures(routeStops, routeUrl);
+
+      } else {
+        alert("No monuments from your list were found within 5km of Bucharest center.");
+      }
+    } catch (error) {
+      console.error("Error generating Bucharest itinerary:", error);
+    }
+  }
+
+  async calculateRouteFromFeatures(features: esri.Graphic[], routeUrl: string) {
+    const routeParams = new RouteParameters({
+      stops: new FeatureSet({
+        features: features
+      }),
+      returnDirections: true,
+      preserveLastStop: true
+    });
+
+    try {
+      const data = await route.solve(routeUrl, routeParams);
+
+      if (data.routeResults && data.routeResults.length > 0) {
+        const routeResult = data.routeResults[0].route;
+
+        if (routeResult && routeResult.geometry && routeResult.geometry.extent) {
+          routeResult.symbol = {
+            type: "simple-line",
+            color: [5, 150, 255, 0.7],
+            width: 4
+          } as any;
+
+          this.graphicsLayerRoutes.add(routeResult);
+          this.view?.goTo(routeResult.geometry.extent.expand(1.5));
+
+          if (data.routeResults[0].directions) {
+            this.showDirections(data.routeResults[0].directions.features);
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Route solving failed:", error);
     }
   }
 
@@ -66,10 +196,12 @@ export class ItinerariesPage implements OnInit, OnDestroy {
         container: this.mapViewEl.nativeElement,
         center: this.center,
         zoom: this.zoom,
-        map: this.map
+        map: this.map,
+        ui: {
+          components: []
+        }
       };
 
-      // Error suppression for ResizeObserver (common in ArcGis)
       const resizeObserverLoopErr = 'ResizeObserver loop limit exceeded';
       const _originalError = console.error;
       console.error = (...args) => {
@@ -91,6 +223,7 @@ export class ItinerariesPage implements OnInit, OnDestroy {
 
       this.addRouting();
       this.addSearchWidget();
+      this.addZoomWidget();
 
       return this.view;
     } catch (error) {
@@ -101,13 +234,23 @@ export class ItinerariesPage implements OnInit, OnDestroy {
     return null;
   }
 
+  addZoomWidget() {
+    if (!this.view) return;
+
+    const zoomWidget = new Zoom({
+      view: this.view,
+      container: "my-zoom-container"
+    });
+  }
+
   addFeatureLayers() {
     this.monumentsLayer = new FeatureLayer({
-      url: "https://services7.arcgis.com/xN1YpHdP6PeZuK0R/arcgis/rest/services/historical_data_dude/FeatureServer/"
+      url: "https://services7.arcgis.com/xN1YpHdP6PeZuK0R/arcgis/rest/services/historical_data_dude/FeatureServer/0",
+      outFields: ["*"]
     });
 
+    this.map.add(this.graphicsLayerRoutes);
     this.map.add(this.monumentsLayer);
-    console.log("Feature layers added");
   }
 
   addGraphicsLayer() {
@@ -120,20 +263,16 @@ export class ItinerariesPage implements OnInit, OnDestroy {
   }
 
   addSearchWidget() {
-    // Guard clause: Check if view exists
     if (!this.view) return;
 
     const searchWidget = new Search({
       view: this.view,
       includeDefaultSources: true,
       locationEnabled: true,
-      popupEnabled: true
+      popupEnabled: true,
+      container: 'my-search-container'
     });
 
-    this.view.ui.add(searchWidget, {
-      position: "top-right",
-      index: 0
-    });
 
     console.log("Search widget added");
   }
@@ -258,6 +397,7 @@ export class ItinerariesPage implements OnInit, OnDestroy {
 
     const simpleMarkerSymbol = {
       type: "simple-marker" as const,
+      size: '10px',
       color: [255, 0, 0],
       outline: { color: [255, 255, 255], width: 1 }
     };
@@ -272,13 +412,11 @@ export class ItinerariesPage implements OnInit, OnDestroy {
   }
 
   addRouting() {
-    // Guard clause: Check if view exists
     if (!this.view) return;
 
     const routeUrl = "https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World";
 
     this.view.on("click", (event) => {
-      // Must check if view exists inside the callback
       if (!this.view) return;
 
       this.view.hitTest(event).then((elem: esri.HitTestResult) => {
@@ -333,6 +471,7 @@ export class ItinerariesPage implements OnInit, OnDestroy {
     const simpleMarkerSymbol = {
       type: "simple-marker" as const,
       color: [226, 119, 40],
+      size: '10px',
       outline: { color: [255, 255, 255], width: 1 }
     };
     const pointGraphic = new Graphic({
@@ -375,9 +514,12 @@ export class ItinerariesPage implements OnInit, OnDestroy {
     }
   }
 
-  showDirections(features: any[]) {
+  async showDirections(features: any[]) {
     // Guard clause
     if (!this.view) return;
+    if (this.directionsElement) {
+      this.directionsElement.remove();
+    }
 
     this.directionsElement = document.createElement("ol");
     this.directionsElement.classList.add(
@@ -385,24 +527,72 @@ export class ItinerariesPage implements OnInit, OnDestroy {
       "esri-widget--panel",
       "esri-directions__scroller"
     );
-    this.directionsElement.style.marginTop = "0";
+    this.directionsElement.style.height = "550px";
+    this.directionsElement.style.width = "100%";
+
+    this.directionsElement.style.position = "static";
+    this.directionsElement.style.overflowY = "auto";
+    this.directionsElement.style.margin = '102px auto';
+
+    this.directionsElement.style.border = "3px solid black";
+    this.directionsElement.style.borderRadius = "4px";
     this.directionsElement.style.padding = "15px 15px 15px 30px";
+    this.directionsElement.style.boxSizing = "border-box";
+    this.directionsElement.style.position = "absolute";
+    this.directionsElement.style.top = "520px";
+
+    let totalDistance: number = 0;
+    let numberOfBuildings: number = 3;
+    let userId = await this.authService.getId();
 
     features.forEach((result) => {
       const direction = document.createElement("li");
-      direction.innerHTML = `${result.attributes.text} (${result.attributes.length} miles)`;
+      const distKm = (result.attributes.length * 1.609).toFixed(2);
+      direction.innerHTML = `${result.attributes.text} (${distKm} km)`;
+      totalDistance += +distKm;
       this.directionsElement.appendChild(direction);
     });
 
-    this.view.ui.empty("top-right");
+    this.view.ui.empty("bottom-right");
     this.view.ui.add(this.directionsElement, "top-right");
+
+    try {
+      const savingItineraryUrl = "http://localhost:3000/api/reviews/itineraries/save";
+      const savingResult = await axios.post(savingItineraryUrl, {
+        distance: totalDistance,
+        userId,
+        numberOfBuildings,
+        ranking: 1,
+        optionBased: ""
+      });
+
+      const itineraryBuildingInsertionUrl = "http://localhost:3000/api/reviews/itinerary-building/insert";
+
+      console.log(this.userMonuments);
+      console.log(this.itineraryBuildingsNames);
+
+      const insertionPromises = this.itineraryBuildingsNames.map(name => {
+        const buildings: Monument[] = this.userMonuments.filter(building => building.name === name);
+
+        console.log(buildings[0]);
+        return axios.post(itineraryBuildingInsertionUrl, {
+          buildingId: buildings[0].buildingId,
+          itineraryId: savingResult.data.insertId
+        }, { withCredentials: true });
+      })
+
+
+      const result = await Promise.all(insertionPromises);
+      console.log(result);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   ngOnDestroy() {
     if (this.view) {
-      this.view.container = null; // Type 'null' is not assignable to type 'HTMLDivElement'.
-      // In newer ArcGIS JS versions, you use view.destroy() or just unset it
-      // this.view.destroy();
+      this.view.container = null;
+      //this.view.destroy();
     }
   }
 }

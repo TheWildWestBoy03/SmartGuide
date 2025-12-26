@@ -2,10 +2,54 @@
   display: flex;
   height: calc(100vh - 200px);
   width: 75%;
+  margin: 16px auto;
+  position: relative;
 }
 
 /* Map view styling */
 .map-view {
   flex: 1; /* Takes up the remaining space next to the sidebar */
-  height: 100%;
+  position: relative;
+  width: 100%; /* Force width */
+  height: 100%; /* Force height */
+}
+
+.generate-itinerary-btn {
+  padding: 8px;
+  background: #296;
+  font-weight: 500;
+  font-size: 20px;
+  font-family: Rockwell;
+  border-radius: 6px;
+  border: 2px solid black;
+  cursor: pointer;
+  display: block;
+  margin: 10px auto;
+}
+
+#my-zoom-container {
+  position: absolute;
+  left: 0px;
+  z-index: 100;
+  background-color: white;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+#my-search-container {
+  position: absolute;
+  right: 0px;
+  z-index: 100;
+  background-color: white;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+.search-styles {
+  height: 550px;
+  width: 90%;
+  overflow-y: auto;
+  margin: 102px auto;
+  border: 3px solid black;
+  border-radius: 4px;
+  padding: 15px 15px 15px 30px;
+  box-sizing: border-box;
 }
